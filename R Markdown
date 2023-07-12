@@ -1,0 +1,256 @@
+---
+title: "ggDoE Functions using A Combination of Anti-Prostate Cancer Drugs Data"
+author: "Casey Truong"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+vignette: |
+  %\VignetteIndexEntry{Vignette Title} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+# Abstract
+
+The following experiment applies a two-level design experiment method to investigate combinations of five anti-cancer drugs, namely, doxorubicin, docetaxel, paclitaxel, cis-dichlorodiamine platinum and dihydroartemisinin, to minimize the prostate cancer cells survival.
+
+
+# 1. Full Factorial Design
+
+A general definition of a two-level full factorial design is with $k$ factors, each with two levels consists of all $2^k$ combinations of the $k$ factors. The main properties of a two-level full factorial designs are:\
+
+• Balance: each factor level appears in the same number of runs.\
+• Orthogonal: for any pair of factors, each possible level combination appears the same number of times in the design.\
+
+In this experiment, there are interactions among the 5 anti-cancer drugs in which factors $D1$, $D2$, $D3$, $D4$, $D5$ are the code for drugs: Doxorubicin, Docetaxel, Paclitaxel, cis-Dichlorodiamine platinum and Dihydroartemisinin accordingly. The response is “Survival (%)”, which means the cancer cell survival and the goal of the experiment is to minimize the response. There are two levels which are coded as 0 and 1 as low and high. For low level (0), factors $D1$, $D2$, $D3$, $D4$, and $D5$ are all 0 mM. For high level (1), $D1$ is 10 mM, $D2$ is 0.01 mM, $D3$ is 0.005 mM, $D4$ and $D5$ is 15 mM. Since this applies a two-level full factorial design method, the number of run is $2^5 = 32$.\
+
+```{r, echo = FALSE}
+library(kableExtra)
+library(readr)
+library(ggDoE)
+prostate2level = read_csv("Prostate2lvl.csv")
+prostate2level %>%
+  kbl() %>%
+  kable_styling()
+```
+
+# 2. Factorial Effects:
+
+## 2.1. Main Effects 
+
+In order to determine which factors are more statistically significant than others, main effects method is applied. Main effects is the effect of one independent variable on the dependent variable and it is calculated as:\
+
+$ME(A) = \bar{z}(A+) - \bar{z}(A-)$\
+
+In which: $\bar{z}(A+)$ is the average of the response when factor $A$ is at the high level, while $\bar{z}(A-)$ is at low level.\
+
+To visualize each factor, a main effects plot graphs the averages of all the observations at each level of the factor and connects them by a line. The vertical height of the line is the difference between the two averages.\
+
+In ggDoE, the function `main_effect` generates a main effect plot for a factor and has the following inputs:\
+
+•	*Design*: factorial design\
+•	*factr*: the name of the factor\
+•	*response*: response variable\
+
+Optional: we can change the color and point size using `point_size` and `color`.\
+
+```{r}
+D1  <-  main_effect(Design = prostate2level, factr = D1,
+                    response = Survival)
+D2  <-  main_effect(Design = prostate2level, factr = D2, 
+                    response = Survival)
+D3  <-  main_effect(Design = prostate2level, factr = D3, 
+                    response = Survival)
+D4 <- main_effect(Design = prostate2level, factr = D4, 
+                  response = Survival)
+D5 <- main_effect(Design = prostate2level, factr = D5, 
+                  response = Survival)
+```
+
+
+```{r,fig.width=6,fig.height=6}
+gridExtra::grid.arrange(D1,D2,D3,D4,D5,ncol = 3)
+
+```
+
+
+Looking at the main effect plot, the horizontal axis represents the factor - the single anti-cancer drug, while the vertical axis represents the mean of survival - the cancel survival cells. By examining the main effects plots from the Prostate data, it appears that $D1$ and $D2$, which are Doxorubicin and Docetaxel, have the most impact on the response since their main effects are the largest, both are at 0.7\
+
+
+## 2.2. Interaction Effect
+
+We also want to examine the relationship between two factors and the response using the interaction effect. It is the interaction between independent variables that affect the dependent variable.\
+
+In ggDoE, the function `interaction_effect` generates an interaction effect plot for a factor and has the following inputs:\
+
+•	*Design*: factorial design\
+•	*factr1*, *factr2*: names of the factors\
+•	*response*: response variable\
+Optional: we can change the color and point size using `point_size` and `color`.\
+
+```{r}
+D1_D2 <-  interaction_effect(Design = prostate2level, 
+                             factr1 = D1, factr2 = D2, 
+                             response = Survival)
+D1_D3 <-  interaction_effect(Design = prostate2level, 
+                             factr1 = D1, factr2 = D3, 
+                             response = Survival)
+D1_D4 <- interaction_effect(Design = prostate2level,
+                            factr1 = D1, factr2 = D4,
+                            response = Survival)
+D1_D5 <- interaction_effect(Design = prostate2level,
+                            factr1 = D1, factr2 = D5,
+                            response = Survival)
+
+D2_D3 <- interaction_effect(Design = prostate2level, 
+                            factr1 = D2, factr2 = D3, 
+                            response = Survival)
+D2_D4 <- interaction_effect(Design = prostate2level,
+                            factr1 = D2, factr2 = D4,
+                            response = Survival)
+D2_D5 <- interaction_effect(Design = prostate2level,
+                            factr1 = D2, factr2 = D5,
+                            response = Survival)
+D3_D4 <- interaction_effect(Design = prostate2level, 
+                            factr1 = D3, factr2 = D4, 
+                            response = Survival)
+D3_D5 <- interaction_effect(Design = prostate2level,
+                            factr1 = D3, factr2 = D5,
+                            response = Survival)
+D4_D5 <- interaction_effect(Design = prostate2level,
+                            factr1 = D4, factr2 = D5,
+                            response = Survival)
+```
+
+
+```{r,fig.width=8,fig.height=7}
+gridExtra::grid.arrange(D1_D2,D1_D3,D1_D4,D1_D5,D2_D3,D2_D4,
+                        D2_D5,D3_D4,D3_D5,D4_D5,
+                        ncol = 3)
+
+```
+
+Looking at the two factor interaction plot between $D1$ and $D4$, the vertical axis represents the mean of the cancer survival cells, while the horizontal axis represents factor $D1$ at the corresponding low and high level. The two level for factor $D4$ are represented by the
+two lines in the plot. For example, the red line represents $D4$ at the low level, and the blue line represents $D4$ at the high level. Only based on this single plot, the response is minimized when $D1$ and $D4$ are set at the high level. Therefore, using interaction effect plot helps determine which level of each drug is set to make the combination between two drugs maximizes the effectiveness. 
+
+
+# 3. Model fit and diagnostics
+
+To study relationships between large number of continuous (quantitative) variables, we apply multiple linear regression. There are four model assumptions when fitting a linear model:\
+
+Linear function: the mean of each response $E(Y_i)$ at each value of the predictor xi is a linear function of the $x_i$.\
+
+Independent: The errors $e_i$ are independent.\
+
+Normally Distributed: The errors $e_i$ at each value of the predictor $x_i$ are normally distributed.\
+
+Equal variances: The errors $e_i$ at each value of the predictor $x_i$ have equal variances.\
+
+
+## 3.1. Fit the linear model 
+
+In order to learn which factor combinations are the most significant, we fit a linear model with 5 main effects ($D1$,$D2$,$D3$,$D4$,$D5$), 10 two factorial interactions ($D1:D2$, $D1:D3$, i.e) and 10 three factorial interactions($D1:D2:D3$, $D1:D2:D4$, i.e).\
+
+
+
+```{r}
+m = lm(Survival ~ (D1+D2+D3+D4+D5)^3, data = prostate2level)
+summary(m)
+
+```
+
+Based on the table, $D1$, $D2$, $D1:D2$ and $D1:D2:D3$ are the most significant at the 5% significance level. Which means Doxorubicin, Docetaxel, the two-drug interaction between Doxorubicin and Docetaxel and the three-drug interaction between Doxorubicin, Docetaxel and Paclitaxel are significant.\
+
+
+## 3.2.	Diagnostic Plots
+
+We use diagnostic plots to see whether residuals can be improved by fixing problems in our data. There are two main diagnostic plots used in this experiment including the residuals vs fit plot and normal QQ-plot.\
+
+
+A residuals vs fit plot is a plot with residuals on the y-axis and fitted values (estimated responses) on the x-axis. This plot is used to detect non-linearity, unequal error variances, and outlier.\ 
+
+
+A normal QQ-plot is used this to determine that the error terms are normally distributed in which the y-axis is the standardized residuals, and x-axis is the theoretical quantiles. A good normal QQ-plot is when residuals are lined well on the straight dashed line.\
+
+```{r,fig.width=8,fig.height=4}
+diagnostic_plots(m)
+```
+
+
+Looking at the residual vs fit plot, it does appear that there may be some curvature in the model and thus a potential need for a quadratic model. Since a two-level factorial design cannot support a quadratic model, this may motivate the need for a three-level factorial design. For normal QQ-plot, this is a well-behaved plot since since the majority of the points follow the straight line.\
+
+
+Since all hat values are the same for all the diagnostic plots, the residual vs leverage plot was removed.\
+
+# 4. Half-normal Plot
+
+A half-normal plot can be used to detect effect significance. A half-normal plot graphs the absolute value of the factorial effects against half-normal quantiles.\
+
+
+Definition: Order the absolute $|\hat{\theta}|_{(i)}$ values as $|\hat{\theta}|_{(1)}<|\hat{\theta}|_{(2)}< \cdots<  |\hat{\theta}|_{(N)}$ and plot them on
+the positive axis of the normal distribution (half-normal).\
+
+The `halfnormal()` function executes the half-normal plot and has the following arguments:\
+
+* *obj*: output from the linear model.\
+* *alpha*: can be specified if Lenth method is used.\
+* *label_active*: identify the significant effects based on Lenth method.\
+
+  
+```{r,fig.width=7,fig.height=6}
+halfnormal(m, label_active = TRUE)
+```
+
+
+The output from this function provides the absolute value of the factorial effect and the half-normal quantiles.\
+
+Based on the plot, we can conclude that $D2$, $D1:D2$ appear to be active effects. While a half-normal plot is a commonly used method to test for effect significant, it is subjective to the users.\
+
+
+# 5. Lenth method
+Definition: A formal test that can assign p values to the effects.\
+
+Pseudo standard error:\
+
+PSE = 1.5 · median$_{|\hat{\theta}|<2.5s_0}|\hat{\theta_{i}}|$\
+
+• Median is computed among the $|\hat{\theta_{i}}|$ with $|\hat{\theta_{i}}|$ < $2.5s_0$\
+  $s_0$ = 1.5 ·median$|\hat{\theta_{i}}|$.\
+  
+t-value:\
+$t_{PSE}$,$i$ = $\frac{\hat{\theta}}{PSE}$\
+
+• If $|t_{PSE},i|$ > $IER_{\alpha}$, H0 is rejected.\
+
+Using `Lenth_method()`, we can easily obtain the above calculations by extracting the results and displaying it in a plot. 
+
+* To obtain a margin of error, multiplying the PSE by the $100 ∗ (1−{\alpha})$ quantile of the td distribution, $t_{d,\alpha/2}$. The degrees of freedom is $d = N/3$.\
+
+For example, the margin of error for a 95% confidence interval for ${\theta_{i}}$ is:\
+                  $ME$ = $t_{d,.025}$ × $PSE$.\
+
+Estimates that are greater than the $ME$ may be viewed as significant.\
+
+A simultaneous margin of error that accounts for multiple testing can also be calculated:\
+                  $SME$ = $t_{d,{\gamma}}$ x $PSE$
+where  ${\gamma}$ = $(1+0.95^{1/N})/2$.
+
+
+
+```{r,fig.width=8,fig.height=6}
+pareto_plot(m)
+```
+
+
+In the Pareto plot, the absolute values of the factorial effects are plotted, where red indicates a negative factorial effect and blue indicates a positive factorial effect.\
+
+Based on the plot, we notice that $D2$ and $D1:D2$ cross the margin of error line, but they do not cross the simultaneous margin of error line. Therefore, Lenth's method matches what we concluded from the half-normal plot above.\
+
+
+
+
+
+
+
