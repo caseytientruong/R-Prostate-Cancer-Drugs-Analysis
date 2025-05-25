@@ -61,5 +61,5 @@ This project demonstrates the power and utility of the ggDoE package in explorin
 
 By combining statistical rigor with intuitive visualizations, ggDoE enhances the transparency and accessibility of factorial analysis. The successful application to a real-world biomedical dataset underscores ggDoE’s value as a research tool for experimental design in scientific studies. As the package continues development, it promises to be a key asset for researchers aiming to optimize multi-factor experiments efficiently.
 
-![png](poster)
+![png](https://github.com/caseytientruong/R-Prostate-Cancer-Drugs-Analysis/blob/main/poster.png)
 
